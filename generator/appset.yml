@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: nginx
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: public
+            short: pub
+  template:
+    metadata:
+      name: 'nginx'
+    spec:
+      project: 'nginx'
+      source:
+        repoURL: https://github.com/mkubant/ingress-nginx.git
+        targetRevision: main
+        path: env-{{name}}
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'nginx'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
